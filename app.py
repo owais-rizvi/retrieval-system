@@ -9,9 +9,11 @@ class Query(BaseModel):
     documents: str
     questions: List[str]
 
-@app.post("/hackrx/run")
+@app.post("/api/v1/hackrx/run")
 async def post_query(query: Query, request: Request):
-    
+    auth = request.headers.get("Authorization")
+    if not auth or not auth.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Unauthorized")
     try:
         result = run_retrieval(query.documents, query.questions)
         return result
